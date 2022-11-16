@@ -39,7 +39,7 @@ class _ButtonState extends State<ButtonSingleComponent> {
     return (Container(
         height: 60,
         width: 80,
-        child: FlatButton(
+        child: TextButton(
           onPressed: () {
             _sendMessage(widget.comandOn!);
           },
@@ -47,8 +47,12 @@ class _ButtonState extends State<ButtonSingleComponent> {
             widget.buttonName!,
             style: TextStyle(color: Colors.white, fontSize: 25),
           ),
-          color: widget.colorButton!,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(widget.colorButton!),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)))),
+          // color: ,
+          // shape: ,
         )));
   }
 

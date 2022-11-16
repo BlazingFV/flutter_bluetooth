@@ -39,8 +39,9 @@ class ListaBluetoothPage extends ListTile {
                     )
                   : const SizedBox(width: 0, height: 0),
               device.isConnected
-                  ? const Icon(Icons.import_export)
+                  ?  Text('CONNECTED',style: TextStyle(color: Colors.greenAccent[700]),)
                   : const SizedBox(width: 0, height: 0),
+                  const SizedBox(width: 15, height: 0),
               device.isBonded
                   ? const Icon(Icons.link)
                   : const SizedBox(width: 0, height: 0),

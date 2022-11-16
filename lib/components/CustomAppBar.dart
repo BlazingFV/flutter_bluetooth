@@ -22,26 +22,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    DisconnectarBluetooth() {
-      Provider.of<StatusConexaoProvider>(context, listen: false)
-          .setDevice(null);
-    }
+    // DisconnectarBluetooth() {
+    //   Provider.of<StatusConexaoProvider>(context, listen: false)
+    //       .setDevice(null);
+    // }
 
     return AppBar(
       toolbarHeight: 100.0,
-      shape: RoundedRectangleBorder(
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(5))),
-      title: new Center(
-          child: Row(
-        children: [
-          new Text(Title!, textAlign: TextAlign.center),
-        ],
-      )),
-      backgroundColor: Color.fromRGBO(237, 46, 39, 1),
+      // title:  Center(
+      //     child: Row(
+      //   children: [
+      //      Text(Title!, textAlign: TextAlign.center),
+      //   ],
+      // )),
+      backgroundColor: Colors.black,
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: Container(
+          child: SizedBox(
             height: 60,
             width: 60,
             child: Consumer<StatusConexaoProvider>(
@@ -53,27 +54,36 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                               Provider.of<StatusConexaoProvider>(context,
                                       listen: false)
                                   .setDevice(null);
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      settings: const RouteSettings(name: '/'),
-                                      builder: (context) =>
-                                          const HomePage())); // push it back in
+                              onPress!();
+                              // Navigator.of(context).pushReplacement(
+                              //     MaterialPageRoute(
+                              //         settings: const RouteSettings(name: '/'),
+                              //         builder: (context) =>
+                              //             const HomePage())); // push it back in
                             }
                           : onPress!(),
                       child: Icon(StatusConnectionProvider.device != null
-                          ? Icons.bluetooth_connected
-                          : Icons.bluetooth_disabled),
+                          ? Icons.settings
+                          : Icons.settings),
                       style: ElevatedButton.styleFrom(
-                          shape: CircleBorder(),
-                          primary: StatusConnectionProvider.device != null
-                              ? Color.fromRGBO(15, 171, 118, 1)
-                              : Colors.black),
+                          shape: const CircleBorder(),
+                          primary:
+                              StatusConnectionProvider.device?.isConnected ??
+                                      false
+                                  ? const Color.fromRGBO(15, 171, 118, 1)
+                                  : Colors.black),
                     )
-                  : SizedBox.shrink());
+                  : const SizedBox.shrink());
             }),
           ),
         )
       ],
+      title: Consumer<StatusConexaoProvider>(
+          builder: (context, StatusConnectionProvider, widget) {
+        return StatusConnectionProvider.device?.isConnected ?? false
+            ? Text('Connected')
+            : Text('Disconnected');
+      }),
     );
   }
 }

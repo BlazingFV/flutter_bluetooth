@@ -10,7 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:layout/controllers/click_controller.dart';
 
-class ButtonSingleClick extends StatefulWidget {
+class ButtonDoubleClick extends StatefulWidget {
   final String? buttonName;
   final String? comandOn;
   final String? comandOff;
@@ -22,7 +22,7 @@ class ButtonSingleClick extends StatefulWidget {
   final String svgImage;
   final int? duration;
 
-  ButtonSingleClick({
+  ButtonDoubleClick({
     Key? key,
     this.buttonName,
     this.comandOn,
@@ -35,7 +35,7 @@ class ButtonSingleClick extends StatefulWidget {
     required this.isClicked,
     this.duration,
   }) : super(key: key);
-  _ButtonSingleClickState createState() => _ButtonSingleClickState();
+  _ButtonState createState() => _ButtonState();
 }
 
 class _Message {
@@ -45,7 +45,7 @@ class _Message {
   _Message(this.whom, this.text);
 }
 
-class _ButtonSingleClickState extends State<ButtonSingleClick> {
+class _ButtonState extends State<ButtonDoubleClick> {
   bool buttonClicado = false;
   final TextEditingController textEditingController = TextEditingController();
   List<_Message> messages = <_Message>[];
@@ -68,8 +68,6 @@ class _ButtonSingleClickState extends State<ButtonSingleClick> {
         Get.find<SingleClickController>();
       },
       builder: (controllerClicking) {
-        // log('${controllerClicking1.isDoubleCLicking} controller 1 is doubleCLicking');
-        // log('${controllerClicking.isDoubleCLicking} controller  is doubleCLicking');
         return Container(
             height: 100,
             width: 95,
@@ -78,37 +76,64 @@ class _ButtonSingleClickState extends State<ButtonSingleClick> {
                 // borderRadius: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                 ),
             child: GestureDetector(
-              onPanDown: (onPan)async {
-                log('OnPan');
+              onDoubleTap: widget.doubleCLick != null
+                  ? () async {
+                      setState(() {
+                        isClicking = true;
+                      });
 
-                if (!controllerClicking1.isDoubleCLicking) {
-                  controllerClicking1.isPaningDown = true;
-                  // controllerClicking1.update();
+                      controllerClicking1.isDoubleCLicking = true;
+                      controllerClicking1.doubleClickButton = true;
 
-                  widget.isClicked!();
-                 await _sendMessage(widget.comandOn!);
+                      if (controllerClicking.isDoubleCLicking) {
+                        Timer(Duration(milliseconds: widget.duration!), () {
+                          setState(() {
+                            isClicking = false;
+                          });
+                          controllerClicking1.isDoubleCLicking = false;
+                          controllerClicking1.doubleClickButton = false;
+                        });
 
-                  log("Button Clicado");
-                  //   // print('$details');
-                  log("${widget.comandOn!} onn");
-                }
-                // }
-                // _changeButtonColor();
-              },
-              onPanEnd: (end)async {
-                if (!controllerClicking1.isDoubleCLicking) {
-                  log('PanCanceld');
+                        // print('$details');
+                        _sendMessage(widget.comandOn!);
+                        while (isClicking) {
+                          await Future.delayed(
+                              const Duration(milliseconds: 300), () {
+                            widget.doubleCLick!();
+                            // log("$isClicking");
+                            // log("${widget.isDoubleCLick}");
 
-                  controllerClicking1.isPaningDown = false;
-                  // controllerClicking1.update();
-                  widget.isClicked!();
+                            controllerClicking1.isPaningDown =
+                                !controllerClicking.isPaningDown;
+                          });
+                        }
+                        if (isClicking == false) {
+                          controllerClicking1.doubleClickButton = false;
+                          controllerClicking1.isDoubleCLicking = false;
+                          controllerClicking1.isPaningDown = false;
 
-                 await _sendMessage(widget.comandOff!);
+                          log('${controllerClicking1.isDoubleCLicking} :controller1 is double clicking');
 
-                  log("${widget.comandOff!} off");
-                }
-                // print('canceled');
-              },
+                          // controllerClicking1.doubleClickButton = false;
+                          // controllerClicking1.isDoubleCLicking = false;
+                          // controllerClicking1.isPaningDown = false;
+
+                          widget.doubleCLick!();
+                          log('${controllerClicking1.isDoubleCLicking} :controller1 is double clicking2');
+                          // controllerClicking.refresh();
+                          // log('${controllerClicking.doubleClickButton} :doubleClickButtonController');
+                          // setState(() {
+                          //   controllerClicking.doubleClickButton = false;
+                          //   controllerClicking.isDoubleCLicking == false;
+                          // });
+                          // setState(() {
+                          //   buttonClicado = false;
+                          // });
+                        }
+                        log("${widget.comandOn!}");
+                      }
+                    }
+                  : null,
 
               // child: widget.svgImage.endsWith(".svg")
               //     ? SvgPicture.asset(
@@ -138,7 +163,6 @@ class _ButtonSingleClickState extends State<ButtonSingleClick> {
 
         setState(() {
           messages.add(_Message(widget.clientID, text));
-          log('${messages.last.text} messages');
         });
       } catch (e) {
         // setState(() {});
